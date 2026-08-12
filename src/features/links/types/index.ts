@@ -1,3 +1,4 @@
+import { UUID } from 'uuidv7'
 import type {
     Status as StatusInstace,
     Task as TaskInstance,
@@ -15,7 +16,7 @@ export type ComponentType = 'WORKFLOW' | 'TASK';
 export interface LinkTarget {
   type: ComponentType;
   // Target ID can be a specific task ID, workflow ID
-  id: string;
+  id: string | UUID | undefined;
 }
 
 /**

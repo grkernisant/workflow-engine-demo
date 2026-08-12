@@ -1,4 +1,17 @@
-import { Link, State, ComponentType, TransitionContext, LinkTarget } from './types';
+import type { Link, ComponentType, TransitionContext, LinkTarget } from '../features/links/types';
+import type { Status as StatusInstance } from '../features/workflows/types';
+
+/**
+ * Architectural Strengths
+ * Loop Safety & Cascade Prevention:
+ *    Queueing transitions (transitionQueue) rather than using direct recursion ensures that cyclic link definitions won't cause call-stack overflows.
+ * 
+ * Deterministic Context: Transitions evaluate using a snapshot of current engine state (TransitionContext),
+ * which ensures conditional rules (e.g., merge gates) make decisions on clean state snapshots.
+ * 
+ * Audit Readiness: Every state change (manual or cascaded) generates a timestamped StateChangeEvent entry,
+ * providing trace logs for UI visualizers or unit tests.
+ */
 
 export class LinkEngine {
   private links: Link[] = [];
@@ -20,9 +33,9 @@ export class LinkEngine {
   public evaluateTransitions(
     sourceType: ComponentType,
     sourceId: string,
-    newState: State,
+    newState: StatusInstance,
     context: TransitionContext
-  ): Array<{ target: LinkTarget; targetState: State; linkId: string }> {
+  ): Array<{ target: LinkTarget; targetState: StatusInstance; linkId: string }> {
     const matchingLinks = this.links.filter((link) => {
       // Check if source matches
       const isSourceMatch =
@@ -35,7 +48,7 @@ export class LinkEngine {
       return isSourceMatch && isStateMatch;
     });
 
-    const pendingTransitions: Array<{ target: LinkTarget; targetState: State; linkId: string }> = [];
+    const pendingTransitions: Array<{ target: LinkTarget; targetState: StatusInstance; linkId: string }> = [];
 
     for (const link of matchingLinks) {
       // Evaluate custom condition (if present) or default to true
