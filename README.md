@@ -73,3 +73,9 @@ export default defineConfig([
 ])
 
 ```
+
+## How to run
+
+- For local development run `npm run dev` (Dev instance should run on localhost:5173 port by default)
+- To build production run `npm run build`
+- To preview production run `npm run preview`
